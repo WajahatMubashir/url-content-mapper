@@ -3,9 +3,9 @@ Contributors: wajahatmubashir
 Donate link: https://wajahatmubashir.netlify.app/
 Tags: ga4, analytics, google tag manager, content groups
 Requires at least: 5.0
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.0
+Stable tag: 1.3
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,9 +31,35 @@ This plugin adds a minimal amount of code, so the impact on performance should b
 After activation, go to **Settings** → **URL Content Mapper** in your WordPress Admin panel.
 
 == Changelog ==
+= 1.3 =
+* CRITICAL FIX: Removed DOMContentLoaded wrapper to fix GA4 timing issues
+* CRITICAL FIX: Script now loads in HEAD instead of footer for proper execution order
+* Fixed URL pattern matching to use pathname instead of full href
+* Improved query parameter handling for patterns like /?wizard=true
+* Fixed sanitization to preserve relative URL patterns like /products/
+* Removed duplicate script enqueuing for better performance
+* Added "pushed once" logic to prevent multiple category assignments
+* WordPress.org compliance improvements
+* Better documentation and code comments
+
+= 1.2 =
+* Added import/export functionality for easy settings backup and migration
+* Enhanced admin interface with better user experience
+* Added file validation and error handling for imports
+* Improved security with WordPress nonces and capability checks
+
+= 1.1 =
+* Improved content group mapping logic
+
 = 1.0 =
 * Initial release: Adds the capability to inject code before GA4/GTM scripts and configure content groups.
 
 == Upgrade Notice ==
-= 1.0 =
-Initial version. No upgrade needed.
+= 1.3 =
+CRITICAL UPDATE: Fixes major timing issues causing "(not set)" content groups in GA4. This update ensures content_category is set before GA4 page_view events fire. Highly recommended for all users.
+
+= 1.2 =
+This update adds import/export functionality for easy settings migration between sites.
+
+= 1.1 =
+This update improves content mapping of pages with parameters.

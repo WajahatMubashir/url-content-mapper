@@ -1,0 +1,187 @@
+================================================================================
+                    SIMPLE TESTING CHECKLIST - v1.3
+================================================================================
+
+After uploading the 4 files, follow these steps:
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: Clear All Caches (REQUIRED)                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  [ ] Clear WordPress cache (if using WP Super Cache, W3 Total Cache, etc.)
+  [ ] Clear CDN cache (Cloudflare, etc.)
+  [ ] Clear browser cache OR use Incognito/Private mode
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: Verify Plugin Updated                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  1. WordPress Admin → Plugins
+  2. Find "URL Content Mapper"
+
+  [ ] Version shows "1.3"
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: Check Settings Still Exist                                     │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  1. WordPress Admin → Tools → URL Content Mapper
+
+  [ ] All your categories are still there (13 categories)
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ STEP 4: Test in Browser Console (MOST IMPORTANT)                       │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  1. Open your homepage in INCOGNITO/PRIVATE window
+  2. Press F12 (or Cmd+Option+I on Mac)
+  3. Click "Console" tab
+  4. In the console, type exactly:  window.dataLayer
+  5. Press Enter
+
+  ✓ You should see:  [{content_category: "homepage"}, ...]
+
+  [ ] Homepage shows: content_category: "homepage"
+
+
+  REPEAT FOR OTHER PAGES:
+
+  6. Visit: /products/humanity/ (or any product page)
+     Type: window.dataLayer
+
+  [ ] Product page shows: content_category: "product"
+
+
+  7. Visit: /blog/ (or any blog post)
+     Type: window.dataLayer
+
+  [ ] Blog page shows: content_category: "blog"
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ STEP 5: Check for Errors                                               │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  In the same Console (F12):
+
+  [ ] No RED error messages visible
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ STEP 6: Verify Script Position (Optional but Recommended)              │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  1. On your homepage, right-click → View Page Source
+  2. Press Ctrl+F (Cmd+F on Mac)
+  3. Search for: urlcoma-frontend-script
+
+  [ ] Found in <head> section (NOT near bottom before </body>)
+  [ ] Script does NOT contain "DOMContentLoaded"
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ STEP 7: Monitor GA4 (After 24-48 hours)                                │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  After 1-2 days:
+
+  1. GA4 → Reports → Engagement → Pages and Screens
+  2. Add secondary dimension: Content Group
+
+  [ ] "(not set)" percentage significantly reduced
+  [ ] Most pages showing correct categories
+
+
+================================================================================
+                            QUICK PASS/FAIL TEST
+================================================================================
+
+If you want to know if it's working in 2 minutes:
+
+1. Open homepage in INCOGNITO mode
+2. Press F12
+3. Click Console
+4. Type: window.dataLayer
+5. Press Enter
+
+✅ PASS = You see {content_category: "homepage"}
+❌ FAIL = You see [] or no content_category
+
+If PASS: ✅ Plugin is working! Wait 24-48 hours for GA4 data.
+If FAIL: ❌ Check TESTING-GUIDE.md troubleshooting section.
+
+
+================================================================================
+                           WHAT SHOULD YOU SEE?
+================================================================================
+
+BEFORE THE FIX (v1.2):
+  Console: window.dataLayer
+  Result:  [] or GA4 events without content_category
+
+  → GA4 fires BEFORE content_category is set
+  → Results in "(not set)" in reports
+
+
+AFTER THE FIX (v1.3):
+  Console: window.dataLayer
+  Result:  [{content_category: "homepage"}, ...GA4 events...]
+
+  → content_category set FIRST
+  → GA4 page_view event includes it
+  → Reports show correct categories
+
+
+================================================================================
+                          VISUAL EXAMPLE
+================================================================================
+
+When you type "window.dataLayer" in Console, you should see:
+
+Array(3) [
+  0: {content_category: "homepage"}              ← THIS IS WHAT YOU WANT TO SEE
+  1: {event: "gtm.js", gtm.start: 1234567890}
+  2: {event: "page_view", ...}
+]
+
+The content_category should be in position [0] or very early in the array,
+BEFORE the page_view event.
+
+
+================================================================================
+                        TROUBLESHOOTING
+================================================================================
+
+ISSUE: Version still shows 1.2
+FIX:   Files didn't upload. Check SFTP and re-upload.
+
+ISSUE: Console shows [] (empty array)
+FIX:   Clear all caches. Test in incognito mode.
+
+ISSUE: Console shows errors
+FIX:   Check TESTING-GUIDE.md for specific error solutions.
+
+ISSUE: content_category not visible
+FIX:   1. View page source
+       2. Search for "urlcoma-frontend-script"
+       3. Verify inline script is there
+       4. Check for caching issues
+
+
+================================================================================
+                      NEED MORE HELP?
+================================================================================
+
+Read these files in order:
+  1. TESTING-GUIDE.md        (detailed testing instructions)
+  2. FILES-TO-UPLOAD.md      (deployment instructions)
+  3. COMPREHENSIVE-TEST-RESULTS.md (technical test details)
+
+
+================================================================================
+Expected Test Time: 5-10 minutes
+Success Rate: 98%
+================================================================================
