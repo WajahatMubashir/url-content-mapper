@@ -104,12 +104,44 @@ function urlcoma_enqueue_script() {
 
                     $path_part = esc_js($path_part);
 
-                    // Parse query parameters - check if there are actual parameters
+                    // Trim whitespace from query part to handle edge cases
+                    $query_part = trim($query_part);
+
+                    // Parse query parameters
                     parse_str($query_part, $query_params);
 
-                    // If query_part is empty (pattern was just "/?"), skip this rule
-                    if (empty($query_params)) {
-                        continue; // Skip this URL pattern as it's invalid
+                    // Handle special case: "/?" or "/path/?" means "match when path has ANY query parameters"
+                    // This is when the pattern ends with "?" but has no actual query params after it
+                    if (empty($query_params) && $query_part === '') {
+                        // This is just "path/?" - match when path matches AND has any query string
+                        if ($type === 'exact') {
+                            $inline_script .= "  if (pathname === '{$path_part}' && window.location.search !== '') { setCategory('{$category}', 1); }\n";
+                        } else {
+                            $inline_script .= "  if (pathname.indexOf('{$path_part}') !== -1 && window.location.search !== '') { setCategory('{$category}', 3); }\n";
+                        }
+                        continue; // Skip to next URL pattern
+                    }
+
+                    // Handle malformed query strings (e.g., "/?foo" or "/?=value")
+                    // These should be skipped as invalid patterns
+                    if (!empty($query_params)) {
+                        $has_valid_params = false;
+                        foreach ($query_params as $key => $value) {
+                            // Valid param must have a non-empty key
+                            if (!empty($key) || $key === '0') {
+                                $has_valid_params = true;
+                                break;
+                            }
+                        }
+
+                        if (!$has_valid_params) {
+                            // Skip this invalid pattern (e.g., "/?=value" results in empty key)
+                            continue;
+                        }
+                    } else {
+                        // If parse_str produced no params and query_part isn't empty, it's malformed
+                        // Skip this invalid pattern (e.g., "/??" or "/?#")
+                        continue;
                     }
 
                     if ($type === 'exact') {
@@ -170,7 +202,7 @@ function urlcoma_enqueue_script() {
         }
     }
 
-    // Push the matched category to dataLayer
+    // Push the matched category to dataLayer (only if we have a matched category)
     $inline_script .= "  if (matchedCategory) {\n";
     $inline_script .= "    window.dataLayer.push({'content_category': matchedCategory});\n";
     $inline_script .= "  }\n";

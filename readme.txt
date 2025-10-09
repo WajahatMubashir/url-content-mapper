@@ -36,9 +36,12 @@ After activation, go to **Settings** → **URL Content Mapper** in your WordPres
 * CRITICAL FIX: Script now loads in HEAD instead of footer for proper execution order
 * Fixed URL pattern matching to use pathname instead of full href
 * Improved query parameter handling for patterns like /?wizard=true
+* Added validation for malformed query strings (e.g., /?=value, /?#)
+* Added support for /? pattern to match pages with any query parameters
+* Improved edge case handling for empty and whitespace query strings
 * Fixed sanitization to preserve relative URL patterns like /products/
 * Removed duplicate script enqueuing for better performance
-* Added "pushed once" logic to prevent multiple category assignments
+* Added priority-based category matching to prevent conflicts
 * WordPress.org compliance improvements
 * Better documentation and code comments
 
